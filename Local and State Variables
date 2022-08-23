@@ -1,0 +1,32 @@
+// Task # 1
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^ 0.8.15;
+
+contract HelloSolidity
+{
+	string welcomeMessage = 'Hello Solidity';
+	
+	function getMessage() public view returns(string memory)
+	{
+		return welcomeMessage;
+	}
+}
+
+// Task # 2
+
+contract Variables
+{
+	uint public stateVariable = 10;
+
+	function returnStateVariable() public view returns(uint)
+	{
+		return stateVariable;
+	}
+
+	function localVariable() pure public returns(uint)
+	{
+		uint Local_Variable = 20;
+		return Local_Variable;
+	}
+}
