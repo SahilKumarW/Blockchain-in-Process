@@ -1,0 +1,135 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >= 0.7.0 < 0.9.0;
+
+// TASK 1
+contract Hello
+{
+	string welcomeMsg = "Hello Solidity";
+
+	function printMsg() public view returns(string memory)
+	{
+		return welcomeMsg;
+	}
+}
+
+// TASK 2
+contract State_and_Local_Variables
+{
+	uint stateVar = 10;
+
+	function returnStateVariable() public view returns(uint)
+	{
+		return stateVar;
+	}
+	function returnLocalVariable() public view returns(uint)
+	{
+		uint localVar = 20;
+		return localVar;
+	}
+}
+
+// TASK 3
+contract Task3
+{
+	uint stateVariable;
+	function set(uint inputNumber) public
+	{
+		stateVariable = inputNumber;
+	}
+	function get() public view returns(uint)
+	{
+		return stateVariable;
+	}
+}
+
+// TASK 4
+contract Evaluation
+{
+	function Evaluate(int a, int b) public pure returns(int)
+	{
+		return ((a + b) - (a - b));
+	}
+}
+
+// TASK 5
+contract Remainder
+{
+	function find(int a) public pure returns(int)
+	{
+		require((a > 0), "Enter a nonnegative number");
+		return (a % 3);
+	}
+}
+
+// TASK 6
+contract AverageCalculator
+{
+	function Average(int a, int b, int c) public pure returns(int)
+	{
+		require((a > 0 && b > 0 && c > 0), "Enter positive numbers");
+		return ((a + b + c) / 3);
+	}
+}
+
+// TASK 7
+contract Sum
+{
+	function digitSum(int n) public pure returns(int)
+	{
+		return (n % 10) + ((n / 10) % 10) + (n / 100);
+	}
+}
+
+// TASK 8
+contract Series_S
+{
+	function nthTerm(uint n, uint a, uint b, uint c) public pure returns(uint)
+	{
+		uint[100] memory arr;
+		uint i;
+		arr[1] = a;
+		arr[2] = b;
+		arr[3] = c;
+		for (i = 4; i <= n; i++)
+		{
+			arr[i] = arr[i - 1] + arr[i - 2] + arr[i - 3];
+		}
+		return arr[n];
+	}
+}
+
+// TASK 9
+contract Exponent
+{
+	function power(uint x, uint y) public pure returns(uint)
+	{
+		return x * *y;
+	}
+}
+
+// TASK 10
+contract PalindromeCheck
+{
+	function palindrome(uint n) public pure returns(uint)
+	{
+		uint original = n;
+		uint remainder;
+		uint reversedNumber = 0;
+
+		while (n != 0)
+		{
+			remainder = n % 10;
+			reversedNumber = reversedNumber * 10 + remainder;
+			n = n / 10;
+		}
+		if (original == reversedNumber)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+}
