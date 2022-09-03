@@ -104,7 +104,10 @@ contract Exponent
 {
 	function power(uint x, uint y) public pure returns(uint)
 	{
-		return x ** y;
+		require ((y >= 0), "Enter a positive power!")
+		{
+			return x ** y;
+		}
 	}
 }
 
