@@ -152,3 +152,19 @@ contract Reversal
         return reverse;
     }
 }
+
+// TASK 12
+contract arrayReversal
+{
+    function reverseArray(uint[] memory array, uint lengthOfArray) public pure returns (uint[] memory)
+    {
+        uint temp;
+
+        for (uint i = 0; i < (lengthOfArray / 2); i++) {
+            temp = array[i];
+            array[i] = array[lengthOfArray - i - 1];
+            array[lengthOfArray - i - 1] = temp;
+        }
+        return array;
+    }
+}
