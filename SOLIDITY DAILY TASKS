@@ -190,7 +190,7 @@ contract arraySorting
         for (uint i = 0; i < lengthOfArray - 1; i++) {
             int min = 0;
 
-            for (uint j = 0; j < lengthOfArray - i - 1; ++j {
+            for (uint j = 0; j < lengthOfArray - i - 1; ++j) {
                 if (array[j] > array[j + 1]) {
                     int temp;
                     temp = array[j];
