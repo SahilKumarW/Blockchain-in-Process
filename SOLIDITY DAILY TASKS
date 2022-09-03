@@ -168,3 +168,16 @@ contract arrayReversal
         return array;
     }
 }
+
+// TASK 13
+contract evenArray
+{
+    function even(uint[] memory array, uint lengthOfArray) public pure returns (uint[] memory)
+    {
+        for (uint i = 0; i < lengthOfArray; i++)
+        {
+            array[i] = array[i] * 2;
+        }
+        return array;
+    }
+}
