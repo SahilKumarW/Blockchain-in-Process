@@ -136,3 +136,19 @@ contract PalindromeCheck
 		}
 	}
 }
+
+// TASK 11
+contract Reversal
+{
+    function reverseDigit(uint n) public pure returns (uint) {
+        uint reverse = 0;
+        uint remainder;
+
+        while (n != 0) {
+            remainder = n % 10;
+            reverse = reverse * 10 + remainder;
+            n /= 10;
+        }
+        return reverse;
+    }
+}
