@@ -1,0 +1,155 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+contract NFTMarketplace is ERC721Upgradeable, OwnableUpgradeable {
+    struct NFT {
+        uint256 id;
+        uint256 price;
+        uint256 auctionEndTime;
+        address seller;
+        bool isSold;
+        address acceptedToken;
+    }
+
+    NFT[] public nfts;
+    uint256 public publicTokenId;
+
+    mapping(uint256 => string) private _tokenURIs;
+    mapping(uint256 => uint256) public highestBids;
+    mapping(uint256 => address) public highestBidders;
+
+    address public tokenAddress;
+
+    function initialize(
+        string memory _name,
+        string memory _symbol,
+        address _tokenAddress
+    ) public initializer {
+        __ERC721_init(_name, _symbol);
+        __Ownable_init();
+        tokenAddress = _tokenAddress;
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory tokenURI) internal {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI set of nonexistent token"
+        );
+        _tokenURIs[tokenId] = tokenURI;
+    }
+
+    function mint(address _to, string memory _tokenURI) public onlyOwner {
+        publicTokenId++;
+        _mint(_to, publicTokenId);
+        _setTokenURI(publicTokenId, _tokenURI);
+    }
+
+    function listForSale(
+        uint256 _tokenId,
+        uint256 _price,
+        address _acceptedToken
+    ) public {
+        require(
+            ownerOf(_tokenId) == msg.sender,
+            "Only NFT owner can list it for sale"
+        );
+        nfts.push(NFT(_tokenId, _price, 0, msg.sender, false, _acceptedToken));
+    }
+
+    function listForAuction(
+        uint256 _tokenId,
+        uint256 _minimumPrice,
+        uint256 _auctionEndTime,
+        address _acceptedToken
+    ) public {
+        require(
+            ownerOf(_tokenId) == msg.sender,
+            "Only NFT owner can list it for auction"
+        );
+        require(
+            _auctionEndTime > block.timestamp,
+            "Auction end time should be in future"
+        );
+        nfts.push(
+            NFT(
+                _tokenId,
+                _minimumPrice,
+                _auctionEndTime,
+                msg.sender,
+                false,
+                _acceptedToken
+            )
+        );
+    }
+
+    function buyNFT(uint256 _index) public payable {
+        NFT memory nft = nfts[_index];
+        require(!nft.isSold, "NFT already sold or auctioned");
+
+        if (nft.acceptedToken == address(0)) {
+            // if ETH is the accepted token
+            require(msg.value >= nft.price, "Not enough ETH sent");
+            require(
+                ownerOf(nft.id) == nft.seller,
+                "NFT not available for sale"
+            );
+            nfts[_index].isSold = true;
+            payable(nft.seller).transfer(msg.value);
+            safeTransferFrom(nft.seller, msg.sender, nft.id, "");
+        } else {
+            // if an ERC20 token is the accepted token
+            require(msg.value == 0, "ETH sent with ERC20 token transaction");
+            require(
+                IERC20(nft.acceptedToken).transferFrom(
+                    msg.sender,
+                    nft.seller,
+                    nft.price
+                ),
+                "Token transfer failed"
+            );
+            require(
+                ownerOf(nft.id) == nft.seller,
+                "NFT not available for sale"
+            );
+            nfts[_index].isSold = true;
+            safeTransferFrom(nft.seller, msg.sender, nft.id, "");
+        }
+    }
+
+    event NewBid(
+        address indexed bidder,
+        uint256 value,
+        uint256 indexed auctionIndex
+    );
+
+    function bidOnAuction(
+        uint256 _index,
+        uint256 tokenId,
+        string memory _tokenURI
+    ) public payable {
+        NFT memory nft = nfts[_index];
+        require(
+            msg.value > nft.price,
+            "Bid value should be greater than current price."
+        );
+        require(
+            msg.value > highestBids[_index],
+            "Bid value should be greater than highest bid."
+        );
+
+        if (highestBidders[_index] != address(0)) {
+            payable(highestBidders[_index]).transfer(highestBids[_index]);
+        }
+
+        highestBids[_index] = msg.value;
+        highestBidders[_index] = msg.sender;
+
+        emit NewBid(msg.sender, msg.value, _index);
+        _setTokenURI(tokenId, _tokenURI);
+    }
+}
